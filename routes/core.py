@@ -1,10 +1,11 @@
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, session, jsonify, request, flash
 from flask_login import current_user, login_required
-from models import UserProgress, WaterLog, SleepLog, Product, db
+from models import UserProgress, WaterLog, SleepLog, Product, UserPlan, DailyPlanEntry, db
 from services.workout_service import recommend_workout, get_equipment_for_workout
 from services.diet_service import recommend_diet, generate_weekly_mealplan
 from services.notification_service import check_notifications_engine
+from services.streak_service import compute_streaks
 
 core_bp = Blueprint('core', __name__)
 
@@ -35,17 +36,48 @@ def dashboard():
     # Hub Dashboard: Focus on Today + Summary
     workout = None
     diet = None
+    chart_labels = []
+    chart_values = []
     
+    today = datetime.utcnow().date()
+    # 0. Fetch Active Plan Entry for Today
+    active_plan = UserPlan.query.filter_by(user_id=current_user.id).order_by(UserPlan.created_at.desc()).first()
+    today_entry = None
+    if active_plan:
+            today_entry = DailyPlanEntry.query.filter_by(plan_id=active_plan.id, date=today).first()
+            
     try:
         # 1. Today's Workout Snippet
-        full_workout = recommend_workout(current_user.goal, current_user.fitness_level, current_user.freq_per_week or 3)
-        
-        workout = {
-            "frequency": full_workout.get("frequency"),
-            "exercises": full_workout.get("exercises", [])[:3], 
-            "total_exercises": len(full_workout.get("exercises", [])),
-            "duration_min": "45"
-        }
+        if today_entry:
+            if today_entry.is_exercise_day:
+                ex_list = today_entry.exercise_payload or []
+                workout = {
+                    "frequency": current_user.freq_per_week,
+                    "exercises": ex_list[:3] if ex_list else [],
+                    "total_exercises": len(ex_list),
+                    "duration_min": "45"
+                }
+                # Keep full workout available for "Start Workout" button context if needed
+                full_workout = {"exercises": ex_list} 
+            else:
+                # Rest Day
+                workout = {
+                    "frequency": current_user.freq_per_week,
+                    "exercises": [],
+                    "total_exercises": 0,
+                    "duration_min": 0,
+                    "is_rest_day": True
+                }
+                full_workout = {"exercises": []}
+        else:
+            # Fallback
+            full_workout = recommend_workout(current_user.goal, current_user.fitness_level, current_user.freq_per_week or 3)
+            workout = {
+                "frequency": full_workout.get("frequency"),
+                "exercises": full_workout.get("exercises", [])[:3], 
+                "total_exercises": len(full_workout.get("exercises", [])),
+                "duration_min": "45"
+            }
 
         # 2. Today's Diet Target
         diet = recommend_diet(current_user.weight_kg, current_user.target_weight_kg, current_user.goal)
@@ -53,9 +85,30 @@ def dashboard():
         # 3. Gamification & Streaks (Needed for Dashboard Summary)
         check_notifications_engine(current_user)
         
+        # Force recalculate streak to ensure it's up to date (especially after fixes)
+        # We need the plan_id.
+        latest_plan = UserPlan.query.filter_by(user_id=current_user.id).order_by(UserPlan.created_at.desc()).first()
+        if latest_plan:
+             compute_streaks(current_user.id, latest_plan.id)
+        
+        # Refresh user instance to get updated values
+        db.session.refresh(current_user)
+        
         workout_streak = current_user.workout_streak
         diet_streak = current_user.diet_streak
         
+        # 4. Chart Data (Last 7 entries)
+        progress_logs = (
+            UserProgress.query.filter_by(user_id=current_user.id)
+            .order_by(UserProgress.logged_at.desc())
+            .limit(7)
+            .all()
+        )
+        # Reverse to show chronological order left-to-right
+        progress_logs.reverse()
+        chart_labels = [log.logged_at.strftime("%b %d") for log in progress_logs]
+        chart_values = [log.weight for log in progress_logs]
+
     except Exception as e:
         print(f"Dashboard Error: {e}")
         # Fallbacks
@@ -65,6 +118,7 @@ def dashboard():
             diet = {"calories": 0, "macros": {"protein_g": 0, "carbs_g": 0, "fats_g": 0}}
         workout_streak = current_user.workout_streak or 0
         diet_streak = current_user.diet_streak or 0
+        # chart_labels/values already defaulted above
 
     return render_template(
         "dashboard.html",
@@ -72,7 +126,9 @@ def dashboard():
         diet=diet,
         user=current_user,
         workout_streak=workout_streak,
-        diet_streak=diet_streak
+        diet_streak=diet_streak,
+        chart_labels=chart_labels,
+        chart_values=chart_values
     )
 
 @core_bp.route("/workout")
@@ -120,13 +176,22 @@ def progress_page():
         SleepLog.date == today_date
     ).first()
     sleep_data = {"hours": sleep_log.hours if sleep_log else 0, "quality": sleep_log.quality if sleep_log else "-"}
+
+    # 3. Calendar Check-In History
+    from models import UserPlan, DailyPlanEntry
+    active_plan = UserPlan.query.filter_by(user_id=current_user.id).order_by(UserPlan.created_at.desc()).first()
+    calendar_entries = []
+    if active_plan:
+        calendar_entries = DailyPlanEntry.query.filter_by(plan_id=active_plan.id).order_by(DailyPlanEntry.date.asc()).all()
     
     return render_template(
         "progress.html", 
         progress_labels=progress_labels, 
         progress_values=progress_values,
         hydration_data={"current": hydration_current, "goal": hydration_goal},
-        sleep_data=sleep_data
+        sleep_data=sleep_data,
+        calendar_entries=calendar_entries,
+        now_date=today_date
     )
 
 @core_bp.route("/account")

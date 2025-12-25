@@ -108,31 +108,60 @@
         <canvas id="detailProgressChart" class="w-full h-64"></canvas>
     </div>
 
-    <!-- Calendar Heatmap (Placeholder for complexity) -->
+    <!-- Calendar Heatmap -->
     <div class="glass-premium rounded-2xl p-4">
-        <h2 class="text-sm font-semibold text-gray-300 mb-4">Consistency</h2>
+        <h2 class="text-sm font-semibold text-gray-300 mb-4">Consistency (This Month)</h2>
         <div class="grid grid-cols-7 gap-1 text-center">
             <!-- Week Header -->
+            <div class="text-xs text-gray-600">S</div>
             <div class="text-xs text-gray-600">M</div>
             <div class="text-xs text-gray-600">T</div>
             <div class="text-xs text-gray-600">W</div>
             <div class="text-xs text-gray-600">T</div>
             <div class="text-xs text-gray-600">F</div>
             <div class="text-xs text-gray-600">S</div>
-            <div class="text-xs text-gray-600">S</div>
 
-            <!-- Fake Days -->
-            {% for i in range(28) %}
-            <div class="aspect-square rounded-sm bg-white/5 hover:bg-cyan-500/20 transition-colors 
-            {% if i in [0, 2, 3, 5, 8, 9, 10, 15, 16] %}bg-cyan-500/40{% endif %}"></div>
+            <!-- Days -->
+            {% if calendar_entries %}
+            {% for entry in calendar_entries %}
+            <div class="aspect-square rounded-md flex items-center justify-center text-[10px] font-bold transition-all relative group
+                    {% if entry.is_exercise_completed and entry.is_diet_completed %}
+                        bg-gradient-to-br from-cyan-500 to-purple-500 text-black shadow-[0_0_10px_rgba(34,211,238,0.3)]
+                    {% elif entry.is_exercise_completed %}
+                        bg-cyan-500/80 text-black
+                    {% elif entry.is_diet_completed %}
+                        bg-purple-500/80 text-black
+                    {% elif entry.date < now_date %}
+                        bg-red-500/10 text-red-500/50
+                    {% else %}
+                        bg-white/5 text-gray-600
+                    {% endif %}
+                ">
+                {{ entry.date.day }}
+
+                <!-- Tooltip -->
+                <div
+                    class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-black/90 border border-white/10 rounded text-xs text-white opacity-0 group-hover:opacity-100 pointer-events-none z-20">
+                    {{ entry.date.strftime('%b %d') }}:
+                    {% if entry.is_exercise_completed and entry.is_diet_completed %}Perfect Day! 🌟
+                    {% elif entry.is_exercise_completed %}Workout Done 💪
+                    {% elif entry.is_diet_completed %}Diet Done 🥗
+                    {% else %}Incomplete{% endif %}
+                </div>
+            </div>
             {% endfor %}
+            {% else %}
+            <div class="col-span-7 py-4 text-center text-gray-500 text-sm">
+                No active plan found.
+            </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Update Weight Form -->
     <div class="glass-premium rounded-2xl p-4">
         <h2 class="text-sm font-semibold text-white mb-3">Log Weight</h2>
-        <form action="{{ url_for('update_progress') }}" method="POST" class="flex gap-2">
+        <form action="{{ url_for('core.update_progress') }}" method="POST" class="flex gap-2">
             <input type="number" step="0.1" name="weight" placeholder="kg"
                 class="flex-1 bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-cyan-400 outline-none">
             <button type="submit" class="bg-white text-black font-bold px-6 rounded-lg text-sm">Save</button>

@@ -20,10 +20,15 @@ def generate_exercises_list(goal: str, fitness_level: str, equipment: str) -> Li
     
     # Target Muscles based on Goal
     primary_muscles = []
-    if "fat_loss" in goal: primary_muscles = ["Full Body", "Legs", "Chest", "Back"]
-    elif "muscle_gain" in goal: primary_muscles = ["Chest", "Back", "Legs", "Shoulders", "Arms"]
-    elif "core" in goal: primary_muscles = ["Abs", "Core", "Lower Back"]
-    else: primary_muscles = ["Full Body"] # Default
+    # Map new simplified keys to logic
+    if "lose" in goal or "fat_loss" in goal: 
+        primary_muscles = ["Full Body", "Legs", "Chest", "Back"]
+    elif "gain" in goal or "muscle_gain" in goal: 
+        primary_muscles = ["Chest", "Back", "Legs", "Shoulders", "Arms"]
+    elif "recomp" in goal or "core" in goal: 
+        primary_muscles = ["Full Body", "Abs", "Back"]
+    else: 
+        primary_muscles = ["Full Body"] # Default
     
     # Equipment Filter
     # If no_equipment, strictly bodyweight. If with_equipment, prefer equipment but allow bodyweight.
@@ -163,16 +168,14 @@ def recommend_workout_day(goal: str, fitness_level: str, day_index: int, is_brea
     rotation = ["muscle_gain", "back", "legs", "abs", "fat_loss"]
     day_type = rotation[day_index % len(rotation)]
     
-    # We use the existing logic to get a full plan, then extract exercises
-    pseudo_goal = day_type
-    if pseudo_goal == "back": pseudo_goal = "muscle_gain" 
-    if pseudo_goal == "legs": pseudo_goal = "muscle_gain" 
+    # Use the robust generation logic which handles phases and volume
+    equipment_prio = "with_equipment" # Default to using equipment if available
     
-    plan = recommend_workout(pseudo_goal, fitness_level, 7) # Get ample exercises
-    exercises = plan.get("exercises", [])
+    # We rotate the "goal" parameter slightly to create variety in daily focus,
+    # but still respect the user's primary goal in the long run.
+    daily_focus = day_type
+    if "back" in day_type: daily_focus = "muscle_gain" # Back is muscle
     
-    # Shuffle or rotate based on day to add variety (simple slice shift)
-    shift = day_index % max(1, len(exercises))
-    exercises = exercises[shift:] + exercises[:shift]
+    exercises = generate_exercises_list(daily_focus, fitness_level, equipment_prio)
     
-    return exercises[:5] # Return top 5 for the day
+    return exercises

@@ -3,42 +3,72 @@
 {% block title %}Measurements | GymSphere{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto space-y-8">
-  <div class="text-center">
-    <div class="text-4xl font-semibold text-cyan-200 flex items-center justify-center gap-3">
-      <span class="text-5xl">📏</span>
-      Measurements
+<div class="max-w-xl mx-auto space-y-8 animate-fade-in-up">
+
+  <!-- Progress Bar (Step 3/5 -> 60%) -->
+  <div class="relative pt-1">
+    <div class="flex mb-2 items-center justify-between">
+      <div class="text-xs font-semibold text-cyan-200 uppercase tracking-widest">
+        Step 3 of 5
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-semibold inline-block text-cyan-200">
+          60%
+        </span>
+      </div>
     </div>
-    <p class="text-gray-300 mt-2">Provide current stats to personalize your plan.</p>
+    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-white/10">
+      <div style="width:60%"
+        class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-cyan-400 to-purple-500 transition-all duration-500">
+      </div>
+    </div>
   </div>
 
-  <form method="POST" action="{{ url_for('measurements') }}" class="space-y-6">
-    <div class="grid sm:grid-cols-3 gap-4">
-      <div class="glass rounded-xl p-4 text-left">
-        <label class="text-sm text-gray-300">Height (cm)</label>
-        <input type="number" step="0.1" name="height_cm" class="w-full mt-2 bg-transparent border border-cyan-400/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="170" />
+  <!-- Header -->
+  <div class="text-center space-y-2">
+    <h1 class="text-3xl md:text-4xl font-bold text-white">
+      Your Statistics
+    </h1>
+    <p class="text-gray-400">Let's calculate your personalized metrics.</p>
+  </div>
+
+  <!-- Form -->
+  <form method="POST" action="{{ url_for('onboarding.measurements') }}" class="space-y-6">
+
+    <!-- Height -->
+    <div class="space-y-2">
+      <label class="text-sm font-medium text-gray-300">Height (cm)</label>
+      <input type="number" step="1" name="height_cm" required placeholder="e.g. 175" class="input-field text-lg"
+        value="{{ current_user.height_cm or '' }}">
+    </div>
+
+    <!-- Weight Row -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-2">
+        <label class="text-sm font-medium text-gray-300">Current Weight (kg)</label>
+        <input type="number" step="0.1" name="weight_kg" required placeholder="e.g. 70" class="input-field text-lg"
+          value="{{ current_user.weight_kg or '' }}">
       </div>
-      <div class="glass rounded-xl p-4 text-left">
-        <label class="text-sm text-gray-300">Weight (kg)</label>
-        <input type="number" step="0.1" name="weight_kg" class="w-full mt-2 bg-transparent border border-cyan-400/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="70" />
-      </div>
-      <div class="glass rounded-xl p-4 text-left">
-        <label class="text-sm text-gray-300">Target Weight (kg)</label>
-        <input type="number" step="0.1" name="target_weight_kg" class="w-full mt-2 bg-transparent border border-cyan-400/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="68" />
+      <div class="space-y-2">
+        <label class="text-sm font-medium text-cyan-300">Target Weight (kg)</label>
+        <input type="number" step="0.1" name="target_weight_kg" required placeholder="e.g. 68"
+          class="input-field text-lg border-cyan-500/30 focus:border-cyan-400"
+          value="{{ current_user.target_weight_kg or '' }}">
       </div>
     </div>
 
-    <div class="flex justify-between items-center">
-      <a href="{{ url_for('body_type') }}" class="text-purple-200 hover:text-cyan-200 transition">← Back</a>
-      <button type="submit" class="px-6 py-3 rounded-xl text-white font-semibold glass neon-border hover:-translate-y-0.5 transition"
-        style="box-shadow: 0 0 12px #22d3ee, 0 0 18px #a855f7;">
-        Save & Continue
+    <!-- Next Button -->
+    <div class="pt-6 flex justify-between items-center">
+      <a href="{{ url_for('onboarding.body_type') }}"
+        class="px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+        ← Back
+      </a>
+      <button type="submit" class="btn-primary px-8 text-lg">
+        Next Step <i class="fas fa-arrow-right ml-2 text-sm"></i>
       </button>
     </div>
+
   </form>
+
 </div>
 {% endblock %}
-
-
-
-

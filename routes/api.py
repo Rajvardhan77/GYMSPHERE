@@ -79,13 +79,15 @@ def api_plan_checkin():
     if entry.plan.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
         
-    # Update status
+    # Update status and last check-in date
     if checkin_type == "exercise":
         entry.is_exercise_completed = True
         entry.exercise_completed_at = datetime.utcnow()
+        current_user.last_workout_date = datetime.utcnow().date()
     elif checkin_type == "diet":
         entry.is_diet_completed = True
         entry.diet_completed_at = datetime.utcnow()
+        current_user.last_diet_date = datetime.utcnow().date()
         
     # Log check-in
     checkin = UserCheckIn(

@@ -1,57 +1,109 @@
 {% extends "base.html" %}
 
-{% block title %}Home - GymSphere{% endblock %}
+{% block title %}GymSphere - AI Fitness Evolution{% endblock %}
 
 {% block content %}
-<div class="text-center py-12">
-  <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-    Welcome to GymSphere
-  </h1>
-  <p class="text-xl text-gray-300 mb-8">
-    Your AI-powered fitness companion for workouts, nutrition, and progress tracking.
-  </p>
-  
-  {% if not current_user.is_authenticated %}
-    <div class="flex gap-4 justify-center">
-      <a href="{{ url_for('register') }}" class="btn-neon">
-        Get Started
+<div class="space-y-24 pb-20">
+
+  <!-- HERO SECTION -->
+  <section class="relative pt-20 pb-0 text-center animate-fade-in-up">
+    <div
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-[500px] bg-gradient-to-r from-cyan-500/20 to-purple-500/20 blur-[120px] rounded-full pointer-events-none -z-10">
+    </div>
+
+    <div
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-cyan-500/30 text-cyan-300 text-xs font-bold tracking-wider mb-6 neon-border-cyan">
+      <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+      AI-POWERED EVOLUTION
+    </div>
+
+    <h1 class="text-6xl md:text-8xl font-bold font-display text-white tracking-tight mb-6 leading-tight">
+      Unleash Your <br />
+      <span
+        class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-text-flow">Potential</span>
+    </h1>
+
+    <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+      The most advanced fitness companion. Adaptive workouts, smart nutrition, and real-time progress tracking driven by
+      neural intelligence.
+    </p>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('auth.register') }}"
+        class="btn-primary text-lg px-10 py-4 shadow-[0_0_40px_rgba(34,211,238,0.3)] hover:shadow-[0_0_60px_rgba(34,211,238,0.5)]">
+        Start Transformation
       </a>
-      <a href="{{ url_for('login') }}" class="glass px-6 py-3 rounded-lg hover:bg-opacity-20 transition">
-        Login
+      <a href="{{ url_for('auth.login') }}"
+        class="px-10 py-4 rounded-full glass hover:bg-white/10 transition text-white font-medium border border-white/10">
+        Member Login
       </a>
-    </div>
-  {% else %}
-    <div class="flex gap-4 justify-center">
-      <a href="{{ url_for('dashboard') }}" class="btn-neon">
-        Go to Dashboard
+      {% else %}
+      <a href="{{ url_for('core.dashboard') }}"
+        class="btn-primary text-lg px-10 py-4 shadow-[0_0_40px_rgba(34,211,238,0.3)]">
+        Launch Hub
       </a>
-      <a href="{{ url_for('goal') }}" class="glass px-6 py-3 rounded-lg hover:bg-opacity-20 transition">
-        Start Onboarding
-      </a>
+      {% endif %}
     </div>
-  {% endif %}
-  
-  <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="glass p-6 rounded-xl">
-      <div class="text-4xl mb-4">💪</div>
-      <h3 class="text-xl font-semibold mb-2 text-cyan-300">AI Workouts</h3>
-      <p class="text-gray-400">Personalized workout plans based on your goals and fitness level.</p>
+
+    <!-- Hero Dashboard Preview -->
+    <div class="mt-20 relative max-w-5xl mx-auto transform perspective-1000">
+      <div
+        class="glass-panel p-2 rounded-2xl border border-white/10 shadow-2xl transform rotate-x-12 hover:rotate-0 transition-transform duration-700 ease-out">
+        <div
+          class="bg-black/80 rounded-xl overflow-hidden aspect-video relative flex items-center justify-center border border-white/5">
+          <!-- Placeholder for Dashboard UI Screenshot -->
+          <div class="text-center">
+            <div class="text-6xl mb-4">🔮</div>
+            <p class="text-gray-500 font-mono text-sm">GymSphere Neural Interface</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="glass p-6 rounded-xl">
-      <div class="text-4xl mb-4">🥗</div>
-      <h3 class="text-xl font-semibold mb-2 text-purple-300">Smart Nutrition</h3>
-      <p class="text-gray-400">Meal plans and macro tracking tailored to your transformation goals.</p>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+    <!-- Card 1 -->
+    <div class="glass-panel p-8 hover:-translate-y-2 transition-transform duration-300 border-t border-cyan-500/50">
+      <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-3xl mb-6 text-cyan-400">
+        ⚡
+      </div>
+      <h3 class="text-2xl font-bold text-white mb-3">Adaptive Training</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">
+        Our AI engine adjusts your workout intensity daily based on your sleep, recovery, and past performance.
+      </p>
     </div>
-    <div class="glass p-6 rounded-xl">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="text-xl font-semibold mb-2 text-pink-300">Progress Tracking</h3>
-      <p class="text-gray-400">Visualize your journey with charts and weekly progress updates.</p>
+
+    <!-- Card 2 -->
+    <div class="glass-panel p-8 hover:-translate-y-2 transition-transform duration-300 border-t border-purple-500/50">
+      <div
+        class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-3xl mb-6 text-purple-400">
+        🧬
+      </div>
+      <h3 class="text-2xl font-bold text-white mb-3">Macro Biology</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">
+        Precision nutrition plans that dynamically calculate your caloric needs for fat loss or muscle gain.
+      </p>
     </div>
-  </div>
+
+    <!-- Card 3 -->
+    <div class="glass-panel p-8 hover:-translate-y-2 transition-transform duration-300 border-t border-pink-500/50">
+      <div class="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center text-3xl mb-6 text-pink-400">
+        🧪
+      </div>
+      <h3 class="text-2xl font-bold text-white mb-3">Data Science</h3>
+      <p class="text-gray-400 text-sm leading-relaxed">
+        Visualize your progress with professional-grade analytics and comprehensive body metrics tracking.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="text-center border-t border-white/5 pt-12">
+    <div class="text-2xl font-bold font-display text-white tracking-tight mb-2">GymSphere</div>
+    <div class="text-sm text-gray-500">© 2024 GymSphere Intelligence. All rights reserved.</div>
+  </footer>
+
 </div>
 {% endblock %}
-
-
-
-
-

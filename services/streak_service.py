@@ -59,88 +59,73 @@ def calculate_streaks(user: User) -> Dict:
     
     entries = DailyPlanEntry.query.filter_by(plan_id=plan.id).filter(DailyPlanEntry.date <= today).order_by(DailyPlanEntry.date.desc()).all()
     
+    # Calculate Workout Streak
     w_streak = 0
-    d_streak = 0
+    # Sort entries by date desc (Today -> Past)
+    # Filter only relevant days (Exercise days or completed entries)
+    # Actually, streak rules: Consecutive days where (Exercise Done OR Rest Day).
+    # If today is NOT done yet, it shouldn't break streak from yesterday.
     
-    # 1. Calculate Workout Streak
-    # Look for unbroken chain from today/yesterday backwards
-    # If today is NOT done yet, we start looking from yesterday.
-    
-    # Helper to check if day is "valid" for streak
-    # Valid = (Exercise Done) OR (Rest Day)
-    # Invalid = (Exercise Day AND Not Done)
-    
-    if not entries: return {"workout": 0, "diet": 0}
-    
-    # Handle Today: If not done, it doesn't break streak yet, just doesn't add to it.
-    # Unless it's already past interaction time? simpler:
-    # If today done -> include. If today not done -> start checking from yesterday.
-    
-    first_entry = entries[0]
-    start_check_idx = 0
-    
-    if first_entry.date == today:
-        workout_done = (first_entry.is_exercise_day and first_entry.is_exercise_completed) or (not first_entry.is_exercise_day)
-        diet_done = first_entry.is_diet_completed
+    # Check if today is in list
+    has_today = False
+    if entries and entries[0].date == today:
+        has_today = True
         
-        if workout_done:
-            w_streak += 1
-        elif first_entry.is_exercise_day and not first_entry.is_exercise_completed:
-            # If today is exercise day and not done, it doesn't break streak from yesterday
-            pass 
-        
-        if diet_done:
-            d_streak += 1
-        
-        start_check_idx = 1 # Continue to yesterday
+    start_index = 0
     
+    # Special handling for "Today":
+    # If Today is DONE -> Streak includes today.
+    # If Today is NOT DONE -> Streak is whatever it was yesterday (doesn't reset to 0 unless yesterday was missed).
+    
+    if has_today:
+        e = entries[0]
+        today_success = (e.is_exercise_day and e.is_exercise_completed) or (not e.is_exercise_day)
+        if today_success:
+            w_streak = 1
+            start_index = 1
+        else:
+            # Today not done (or falied), so streak is based on yesterday.
+            # But if today is required and failed? (Usually exercise must be done).
+            # If not done yet, we ignore today for streak calculation and check yesterday.
+            start_index = 1
+            pass
+            
+            
     # Iterate backwards
-    for i in range(start_check_idx, len(entries)):
+    for i in range(start_index, len(entries)):
         e = entries[i]
+        is_success = (e.is_exercise_day and e.is_exercise_completed) or (not e.is_exercise_day)
         
-        # Workout Logic
-        # Rest days maintain streak
-        is_success_w = (e.is_exercise_day and e.is_exercise_completed) or (not e.is_exercise_day)
-        
-        # Check gap between dates? We assume entries are contiguous days.
-        # If there's a date gap, streak breaks.
-        expected_date = today - timedelta(days=i) # Approximate
-        # We should check date continuity if strictly needed, but let's assume entries exist for every day in plan
-        
-        if is_success_w:
+        # Check continuity (optional, but assumed contiguous for now)
+        # If we find a failure, STOP.
+        if is_success:
             w_streak += 1
         else:
             break
+
+    # Calculate Diet Streak (simpler: pure consecutive completed days)
+    d_streak = 0
+    d_start = 0
+    if has_today:
+        if entries[0].is_diet_completed:
+            d_streak = 1
+            d_start = 1
+        else:
+            d_start = 1 # Skip today if not done
             
-    # 2. Calculate Diet Streak
-    # Iterate backwards again
-    w_streak_temp = w_streak # Save it
-    
-    # Reset for diet
-    # Logic: Diet must be done every day
-    # Continue from where we left off or restart loop? Restart loop is clearer
-    
-    # Simple Diet Loop
-    d_streak_count = 0
-    # Check today again for diet
-    if entries[0].date == today and entries[0].is_diet_completed:
-        d_streak_count = 1
-    
-    # Backwards from yesterday
-    for i in range(1 if entries[0].date == today else 0, len(entries)):
-        e = entries[i]
-        if e.is_diet_completed:
-            d_streak_count += 1
+    for i in range(d_start, len(entries)):
+        if entries[i].is_diet_completed:
+            d_streak += 1
         else:
             break
             
     # Update User Model
-    if w_streak_temp != user.workout_streak or d_streak_count != user.diet_streak:
-        user.workout_streak = w_streak_temp
-        user.diet_streak = d_streak_count
+    if w_streak != user.workout_streak or d_streak != user.diet_streak:
+        user.workout_streak = w_streak
+        user.diet_streak = d_streak
         db.session.commit()
     
-    return {"workout": w_streak_temp, "diet": d_streak_count}
+    return {"workout": w_streak, "diet": d_streak}
 
 def compute_streaks(user_id: int, plan_id: int) -> Dict:
     """Wrapper for backward compatibility."""

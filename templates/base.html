@@ -6,42 +6,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}GymSphere{% endblock %}</title>
 
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              black: '#050505',
+              dark: '#0A0A0F',
+              cyan: '#22d3ee',
+              purple: '#a855f7',
+              pink: '#ec4899',
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <!-- Global CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
 
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lottie Player -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
   <style>
+    /* Critical Critical CSS Variables moved to styles.css but kept basic reset here */
     :root {
-      --glass-bg: rgba(255, 255, 255, 0.06);
-      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
       --glow-cyan: #22d3ee;
       --glow-purple: #a855f7;
-    }
-
-    body {
-      background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.15), transparent 25%),
-        radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.2), transparent 30%),
-        linear-gradient(135deg, #050505 0%, #0b0315 50%, #140526 100%);
-      min-height: 100vh;
-      color: #e9e9ff;
-    }
-
-    .glass {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(34, 211, 238, 0.15), 0 0 25px rgba(168, 85, 247, 0.12);
-    }
-
-    .neon-border {
-      box-shadow: 0 0 12px var(--glow-cyan), 0 0 24px var(--glow-purple);
-    }
-
-    a:hover {
-      color: var(--glow-cyan);
     }
   </style>
 </head>
@@ -73,10 +86,10 @@
 
     <!-- Desktop Menu -->
     <div class="hidden md:flex items-center gap-4 text-sm">
-      <a href="{{ url_for('index') }}" class="hover:text-cyan-300 transition">Home</a>
+      <a href="{{ url_for('core.index') }}" class="hover:text-cyan-300 transition">Home</a>
       {% if current_user.is_authenticated %}
-      <a href="{{ url_for('dashboard') }}" class="hover:text-cyan-300 transition">Dashboard</a>
-      <a href="{{ url_for('shop_page') }}" class="hover:text-cyan-300 transition">Shop</a>
+      <a href="{{ url_for('core.dashboard') }}" class="hover:text-cyan-300 transition">Dashboard</a>
+      <a href="{{ url_for('core.shop_page') }}" class="hover:text-cyan-300 transition">Shop</a>
       <button id="notifBtn" class="relative hover:text-cyan-300 transition">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,24 +98,24 @@
         </svg>
         <span id="notifBadge" class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
       </button>
-      <a href="{{ url_for('logout') }}" class="hover:text-cyan-300 transition">Logout</a>
+      <a href="{{ url_for('auth.logout') }}" class="hover:text-cyan-300 transition">Logout</a>
       {% else %}
-      <a href="{{ url_for('login') }}" class="hover:text-cyan-300 transition">Login</a>
-      <a href="{{ url_for('register') }}" class="hover:text-purple-300 transition">Register</a>
+      <a href="{{ url_for('auth.login') }}" class="hover:text-cyan-300 transition">Login</a>
+      <a href="{{ url_for('auth.register') }}" class="hover:text-purple-300 transition">Register</a>
       {% endif %}
     </div>
 
     <!-- Mobile Menu (Hidden by default) -->
     <div id="mobileMenu"
       class="absolute top-full left-0 right-0 mt-4 mx-4 p-4 glass neon-border rounded-xl hidden flex-col gap-4 text-center md:hidden z-50">
-      <a href="{{ url_for('index') }}" class="block py-2 hover:text-cyan-300 transition">Home</a>
+      <a href="{{ url_for('core.index') }}" class="block py-2 hover:text-cyan-300 transition">Home</a>
       {% if current_user.is_authenticated %}
-      <a href="{{ url_for('dashboard') }}" class="block py-2 hover:text-cyan-300 transition">Dashboard</a>
-      <a href="{{ url_for('shop_page') }}" class="block py-2 hover:text-cyan-300 transition">Shop</a>
-      <a href="{{ url_for('logout') }}" class="block py-2 hover:text-cyan-300 transition">Logout</a>
+      <a href="{{ url_for('core.dashboard') }}" class="block py-2 hover:text-cyan-300 transition">Dashboard</a>
+      <a href="{{ url_for('core.shop_page') }}" class="block py-2 hover:text-cyan-300 transition">Shop</a>
+      <a href="{{ url_for('auth.logout') }}" class="block py-2 hover:text-cyan-300 transition">Logout</a>
       {% else %}
-      <a href="{{ url_for('login') }}" class="block py-2 hover:text-cyan-300 transition">Login</a>
-      <a href="{{ url_for('register') }}" class="block py-2 hover:text-purple-300 transition">Register</a>
+      <a href="{{ url_for('auth.login') }}" class="block py-2 hover:text-cyan-300 transition">Login</a>
+      <a href="{{ url_for('auth.register') }}" class="block py-2 hover:text-purple-300 transition">Register</a>
       {% endif %}
     </div>
   </nav>

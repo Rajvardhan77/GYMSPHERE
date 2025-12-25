@@ -3,147 +3,287 @@
 {% block title %}Hub | GymSphere{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-8 animate-fade-in-up">
 
-  <!-- 1. Welcome & Quick Stats (Apple Style) -->
-  <section class="flex items-center justify-between">
+  <!-- 1. Header & Greeting -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-white tracking-tight">Today</h1>
-      <p class="text-sm text-gray-400">Welcome back, {{ user.fullname }}</p>
-    </div>
-
-    <!-- Mini Progress Rings (Conceptual) -->
-    <div class="flex items-center gap-2">
-      <!-- Workout Streak -->
-      <div class="flex flex-col items-center bg-white/5 border border-white/10 rounded-lg px-3 py-1">
-        <div class="text-[10px] text-gray-400 uppercase tracking-wider">Workout</div>
-        <div class="text-lg font-bold text-cyan-400 flex items-center gap-1">
-          {{ workout_streak }} <span class="text-sm">🔥</span>
-        </div>
-      </div>
-      <!-- Diet Streak -->
-      <div class="flex flex-col items-center bg-white/5 border border-white/10 rounded-lg px-3 py-1">
-        <div class="text-[10px] text-gray-400 uppercase tracking-wider">Diet</div>
-        <div class="text-lg font-bold text-purple-400 flex items-center gap-1">
-          {{ diet_streak }} <span class="text-sm">🍏</span>
-        </div>
+      <h1 class="text-3xl font-bold font-display text-white tracking-tight flex items-center gap-2">
+        <span id="greetingIcon">👋</span> <span id="timeGreeting">Hello</span>, {{ user.fullname.split()[0] }}
+      </h1>
+      <div class="flex items-center gap-4">
+        <p class="text-sm text-gray-400">Let's crush your {{ user.goal }} goals today.</p>
+        <a href="{{ url_for('core.account_page') }}" class="text-gray-400 hover:text-white transition"><i
+            class="fas fa-user-circle text-xl"></i></a>
       </div>
     </div>
-  </section>
 
-  <!-- 2. Today's Workout Preview -->
-  <section>
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Today's Workout</h2>
-      <a href="{{ url_for('workout_page') }}" class="text-xs text-cyan-400 hover:text-white transition-colors">See
-        details</a>
+    <!-- Quick Streaks -->
+    <div class="flex items-center gap-3">
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-3 border-l-2 border-cyan-400">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Workout Streak</div>
+        <div class="text-xl font-bold text-white">{{ workout_streak }} <span class="text-base">🔥</span></div>
+      </div>
+      <div class="glass px-4 py-2 rounded-xl flex items-center gap-3 border-l-2 border-purple-400">
+        <div class="text-xs text-gray-400 uppercase tracking-wider">Diet Streak</div>
+        <div class="text-xl font-bold text-white">{{ diet_streak }} <span class="text-base">🍏</span></div>
+      </div>
     </div>
+  </div>
 
-    <div class="glass-premium rounded-2xl overflow-hidden relative group hover:border-cyan-500/30 transition-colors">
-      <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl group-hover:scale-110 transition-transform">⚡</div>
+  <!-- 2. Main Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <div class="p-5 relative z-10">
-        <div class="flex items-start justify-between">
-          <div>
-            <div class="text-lg font-bold text-white mb-1">Full Body Power</div>
-            <div class="text-sm text-gray-400 mb-4">{{ workout.duration_min }} mins • {{ workout.total_exercises }}
-              exercises</div>
+    <!-- LEFT COL: Workout & Activity (2/3 width on large) -->
+    <div class="lg:col-span-2 space-y-6">
 
-            <div class="flex flex-wrap gap-2 mb-4">
+      <!-- Featured Workout Card -->
+      <div class="relative group overflow-hidden rounded-3xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 mix-blend-overlay"></div>
+        <div
+          class="glass-panel p-6 md:p-8 relative z-10 border border-white/10 hover:border-cyan-400/50 transition-colors duration-300">
+          <div
+            class="absolute top-4 right-4 text-xs font-bold px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full border border-cyan-500/30">
+            TODAY'S SESSION
+          </div>
+
+          <div class="mt-2 text-white">
+            <h2 class="text-3xl font-bold font-display mb-2">Full Body Power</h2>
+            <div class="flex items-center gap-4 text-sm text-gray-300 mb-6">
+              <span class="flex items-center gap-1"><i class="far fa-clock"></i> {{ workout.duration_min }} mins</span>
+              <span class="flex items-center gap-1"><i class="fas fa-dumbbell"></i> {{ workout.total_exercises }}
+                Exercises</span>
+              <span class="flex items-center gap-1"><i class="fas fa-fire"></i> High Intensity</span>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-8">
               {% for ex in workout.exercises %}
-              <span class="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-300">
+              <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300">
                 {{ ex.name }}
               </span>
               {% endfor %}
+              <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-400">+ more</span>
+            </div>
+
+            <div class="flex gap-4">
+              <a href="{{ url_for('core.workout_page') }}"
+                class="btn-primary px-8 group-hover:scale-105 transition-transform">
+                Start Workout <i class="fas fa-play ml-2 text-xs"></i>
+              </a>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="flex items-center gap-3 mt-2">
-          <a href="{{ url_for('workout_page') }}"
-            class="flex-1 bg-white text-black font-bold text-center py-2.5 rounded-lg text-sm hover:bg-cyan-400 transition-colors">
-            Start Workout
-          </a>
-          <button
-            class="w-10 h-10 flex items-center justify-center rounded-lg border border-white/20 hover:bg-white/10 transition-colors text-white">
-            ✓
+      <!-- Activity Chart -->
+      <div class="glass-panel p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="font-bold text-white flex items-center gap-2">
+            <i class="fas fa-chart-line text-cyan-400"></i> Weight Trend
+          </h3>
+          <a href="{{ url_for('core.progress_page') }}" class="text-xs text-gray-400 hover:text-white transition">Full
+            History &rarr;</a>
+        </div>
+        <div class="h-64 w-full">
+          <canvas id="weightChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COL: Nutrition & Quick Actions -->
+    <div class="space-y-6">
+
+      <!-- Nutrition Ring Card -->
+      <div class="glass-panel p-6 text-center">
+        <h3 class="font-bold text-white mb-4 text-left border-b border-white/5 pb-2">Nutrition Target</h3>
+
+        <div class="relative w-40 h-40 mx-auto mb-4">
+          <!-- Circular Progress (Placeholder for Chart.js doughnut or SVG) -->
+          <svg class="w-full h-full transform -rotate-90">
+            <circle cx="80" cy="80" r="70" stroke="rgba(255,255,255,0.1)" stroke-width="12" fill="transparent"></circle>
+            <circle cx="80" cy="80" r="70" stroke="#22d3ee" stroke-width="12" fill="transparent" stroke-dasharray="440"
+              stroke-dashoffset="100" stroke-linecap="round"></circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-3xl font-bold text-white">{{ diet.calories }}</span>
+            <span class="text-xs text-gray-400 uppercase">Kcal Left</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-cyan-400 font-bold">{{ diet.macros.protein_g }}g</div>
+            <div class="text-gray-500">Protein</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-purple-400 font-bold">{{ diet.macros.carbs_g }}g</div>
+            <div class="text-gray-500">Carbs</div>
+          </div>
+          <div class="bg-white/5 rounded-lg p-2">
+            <div class="text-pink-400 font-bold">{{ diet.macros.fats_g }}g</div>
+            <div class="text-gray-500">Fats</div>
+          </div>
+        </div>
+
+        <a href="{{ url_for('core.diet_page') }}"
+          class="block w-full mt-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-sm text-gray-300 transition">View
+          Meal Plan</a>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="glass-panel p-6">
+        <h3 class="font-bold text-white mb-4 text-left">Quick Actions</h3>
+        <div class="space-y-3">
+          <button onclick="logWater()"
+            class="w-full text-left p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 to-transparent hover:from-cyan-500/20 border border-cyan-500/20 text-cyan-200 text-sm font-medium transition flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">💧</span>
+            Log Water Intake
           </button>
+          <button onclick="logWeight()"
+            class="w-full text-left p-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-transparent hover:from-purple-500/20 border border-purple-500/20 text-purple-200 text-sm font-medium transition flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">⚖️</span>
+            Update Weight
+          </button>
+          <a href="{{ url_for('core.shop_page') }}"
+            class="w-full text-left p-3 rounded-xl bg-gradient-to-r from-pink-500/10 to-transparent hover:from-pink-500/20 border border-pink-500/20 text-pink-200 text-sm font-medium transition flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center">🛍️</span>
+            Shop Gear
+          </a>
         </div>
       </div>
 
-      <!-- Progress Bar (Bottom) -->
-      <div class="h-1 bg-white/5 w-full mt-4">
-        <!-- 0% progress for start of day -->
-        <div class="h-full bg-cyan-400 w-0"></div>
-      </div>
     </div>
-  </section>
-
-
-
-  <!-- 4. Nutrition Summary (Condensed) -->
-  <section>
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Nutrition Target</h2>
-    </div>
-    <div class="glass-premium rounded-2xl p-4 flex items-center justify-between">
-      <div>
-        <div class="text-xl font-bold text-white">{{ diet.calories }} <span class="text-xs text-gray-400">kcal
-            left</span></div>
-        <div class="text-[10px] text-gray-400 flex gap-2 mt-1">
-          <span>P: {{ diet.macros.protein_g }}g</span>
-          <span class="text-gray-600">|</span>
-          <span>C: {{ diet.macros.carbs_g }}g</span>
-          <span class="text-gray-600">|</span>
-          <span>F: {{ diet.macros.fats_g }}g</span>
-        </div>
-      </div>
-      <a href="{{ url_for('diet_page') }}"
-        class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 text-white transition-colors">
-        →
-      </a>
-    </div>
-  </section>
-
-  <script>
-    // Scripts for simple interactions moved to respective pages or main.js
-  </script>
-
-
-
-  <!-- 5. AI Insight (Minimal) -->
-  <section class="glass-premium rounded-xl p-4 border-l-2 border-cyan-400 flex gap-3 items-start">
-    <div class="text-cyan-400 pt-0.5">✨</div>
-    <div>
-      <div class="text-xs font-bold text-cyan-400 mb-1">AI INSIGHT</div>
-      <p class="text-sm text-gray-300 leading-snug">Your protein intake has been consistent for 3 days. Keep it up to
-        maximize recovery!</p>
-    </div>
-  </section>
-
-  <!-- 5. Progress Teaser -->
-  <section>
-    <a href="{{ url_for('progress_page') }}"
-      class="block glass-premium rounded-xl p-4 hover:bg-white/5 transition-colors">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2 rounded-lg bg-green-500/10 text-green-400">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
-              </path>
-            </svg>
-          </div>
-          <div>
-            <div class="text-sm font-semibold text-white">Weight Trend</div>
-            <div class="text-xs text-gray-400">On track with goal</div>
-          </div>
-        </div>
-        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-      </div>
-    </a>
-  </section>
+  </div>
 
 </div>
+
+<!-- Interactive Scripts -->
+<script>
+  function logWater() {
+    // Simple prompt for now, could be a modal
+    if (confirm("Log 250ml of water?")) {
+      fetch('/api/water/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 250 })
+      })
+        .then(r => r.json())
+        .then(d => {
+          if (d.status === 'ok') {
+            alert("Hydration logged! 💧");
+            // Optional: update UI without reload if simple, or reload
+            location.reload();
+          }
+        });
+    }
+  }
+
+  function logWeight() {
+    let weight = prompt("Enter current weight (kg):");
+    if (weight) {
+      // Use a hidden form or XHR. Reusing the update_progress route logic might be cleaner via AJAX
+      const formData = new FormData();
+      formData.append('weight', weight);
+
+      fetch('/update_progress', {
+        method: 'POST',
+        body: formData
+      }).then(() => {
+        alert("Weight updated! ⚖️");
+        location.reload();
+      });
+    }
+  }
+
+  // 1. Greeting Logic
+  const hour = new Date().getHours();
+  const greetingEl = document.getElementById('timeGreeting');
+  const iconEl = document.getElementById('greetingIcon');
+  if (hour < 12) {
+    greetingEl.innerText = 'Good Morning';
+    iconEl.innerText = '🌅';
+  } else if (hour < 18) {
+    greetingEl.innerText = 'Good Afternoon';
+    iconEl.innerText = '☀️';
+  } else {
+    greetingEl.innerText = 'Good Evening';
+    iconEl.innerText = '🌙';
+  }
+
+  // 2. Chart.js Implementation
+  const ctx = document.getElementById('weightChart').getContext('2d');
+
+  // Design System Colors from CSS
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, 'rgba(34, 211, 238, 0.5)'); // Cyan
+  gradient.addColorStop(1, 'rgba(34, 211, 238, 0.0)');
+
+  const weightChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels | tojson}},
+  datasets: [{
+    label: 'Weight (kg)',
+    data: {{ chart_values | tojson}},
+    borderColor: '#22d3ee',
+    backgroundColor: gradient,
+    borderWidth: 3,
+    pointBackgroundColor: '#050505',
+    pointBorderColor: '#22d3ee',
+    pointBorderWidth: 2,
+    pointRadius: 4,
+    pointHoverRadius: 6,
+    fill: true,
+    tension: 0.4
+          }]
+      },
+  options: {
+    responsive: true,
+      maintainAspectRatio: false,
+        plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(30, 30, 40, 0.9)',
+          titleColor: '#fff',
+            bodyColor: '#e9e9ff',
+              borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                  padding: 10,
+                    displayColors: false,
+              }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+            drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8',
+            font: {
+            family: "'Inter', sans-serif",
+              size: 11
+          }
+        }
+      },
+      y: {
+        grid: {
+          color: 'rgba(255, 255, 255, 0.05)',
+            drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8',
+            font: {
+            family: "'Inter', sans-serif",
+              size: 11
+          }
+        }
+      }
+    }
+  }
+  });
+</script>
 {% endblock %}

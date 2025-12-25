@@ -12,7 +12,7 @@
     <p class="text-gray-300 mt-2">Join GymSphere and start your transformation.</p>
   </div>
 
-  <form method="POST" action="{{ url_for('register') }}" class="glass neon-border rounded-3xl p-8 space-y-5">
+  <form method="POST" action="{{ url_for('auth.register') }}" class="glass neon-border rounded-3xl p-8 space-y-5">
     <div class="text-left space-y-2">
       <label class="text-sm text-gray-300">Full Name</label>
       <input type="text" name="fullname" required
@@ -40,11 +40,7 @@
 
   <div class="text-sm text-gray-300">
     Already have an account?
-    <a href="{{ url_for('login') }}" class="text-cyan-200 hover:text-purple-200 transition">Login</a>
+    <a href="{{ url_for('auth.login') }}" class="text-cyan-200 hover:text-purple-200 transition">Login</a>
   </div>
 </div>
 {% endblock %}
-
-
-
-

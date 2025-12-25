@@ -1,259 +1,300 @@
 /**
- * GymSphere Neon Glow Theme Stylesheet
- * Custom CSS for neon theme, glassmorphism, and animations
+ * GymSphere 360 - Premium Design System
+ * Focus: High-end, Ultimate Dark Mode, Glassmorphism, Animations
  */
 
-/* CSS Variables for Neon Theme */
+/* -------------------------------------
+   1. VARIABLES & TOKENS
+------------------------------------- */
 :root {
-    --glass-bg: rgba(255, 255, 255, 0.06);
-    --glass-border: rgba(255, 255, 255, 0.15);
-    --glow-cyan: #22d3ee;
-    --glow-purple: #a855f7;
-    --glow-pink: #ec4899;
-    --bg-dark: #050505;
-    --bg-purple-dark: #0b0315;
-    --bg-purple-deep: #140526;
+    /* Colors */
+    --bg-core: #050505;
+    --bg-card: rgba(20, 20, 25, 0.6);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.12);
+
+    /* Brand Accents */
+    --primary-cyan: #22d3ee;
+    --primary-purple: #a855f7;
+    --primary-pink: #ec4899;
+    --accent-blue: #3b82f6;
+
+    /* Text */
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+
+    /* Shadows & Glows */
+    --glow-sm: 0 0 10px rgba(34, 211, 238, 0.3);
+    --glow-md: 0 0 20px rgba(168, 85, 247, 0.4);
+    --glow-lg: 0 0 40px rgba(34, 211, 238, 0.2);
+
+    /* Transitions */
+    --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Base Background */
+/* -------------------------------------
+   2. CORE RESET & BODY
+------------------------------------- */
 body {
-    background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.15), transparent 25%),
-                radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.2), transparent 30%),
-                linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-purple-dark) 50%, var(--bg-purple-deep) 100%);
+    background-color: var(--bg-core);
+    background:
+        radial-gradient(circle at 15% 15%, rgba(34, 211, 238, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(5, 5, 10, 1) 0%, #000000 100%);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
-    color: #e9e9ff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* Glassmorphism Card */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* -------------------------------------
+   3. UTILITIES & ANIMATIONS
+------------------------------------- */
+
+/* Fade In Up - Standard Entry */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s var(--ease-smooth) forwards;
+}
+
+/* Staggered Delays (up to 5 items) */
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+.delay-300 {
+    animation-delay: 0.3s;
+}
+
+.delay-400 {
+    animation-delay: 0.4s;
+}
+
+.delay-500 {
+    animation-delay: 0.5s;
+}
+
+/* Pulse Glow - Subtle breathing effect */
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+    }
+}
+
+.pulse-glow {
+    animation: pulseGlow 3s infinite;
+}
+
+/* Gradient Text */
+.text-gradient {
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-purple) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* -------------------------------------
+   4. GLASSMORPHISM SYSTEM
+------------------------------------- */
+
+/* Standard Glass Card */
 .glass {
     background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 
-                0 0 25px rgba(34, 211, 238, 0.15), 
-                0 0 25px rgba(168, 85, 247, 0.12);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s var(--ease-smooth);
 }
 
-/* Neon Border Glow */
-.neon-border {
-    box-shadow: 0 0 12px var(--glow-cyan), 
-                0 0 24px var(--glow-purple);
-}
-
-.neon-border-cyan {
-    box-shadow: 0 0 15px var(--glow-cyan),
-                0 0 30px rgba(34, 211, 238, 0.5);
-}
-
-.neon-border-purple {
-    box-shadow: 0 0 15px var(--glow-purple),
-                0 0 30px rgba(168, 85, 247, 0.5);
-}
-
-/* Neon Glow Buttons */
-.btn-neon {
-    background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple));
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4),
-                0 0 40px rgba(168, 85, 247, 0.3);
-}
-
-.btn-neon:hover {
+.glass:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--glass-highlight);
     transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.6),
-                0 0 60px rgba(168, 85, 247, 0.5);
 }
 
-.btn-neon:active {
-    transform: translateY(0);
+/* Premium Panel (Darker, standard for dashboard widgets) */
+.glass-panel {
+    background: linear-gradient(180deg, rgba(30, 30, 40, 0.7) 0%, rgba(20, 20, 25, 0.8) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.5rem;
+    /* Large rounded corners */
 }
 
-/* Glowing Input Fields */
-.input-glow {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(34, 211, 238, 0.3);
-    color: #e9e9ff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+/* Interactive Card (Buttons, Selectable Items) */
+.glass-interactive {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
 }
 
-.input-glow:focus {
-    outline: none;
-    border-color: var(--glow-cyan);
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+.glass-interactive:hover {
     background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.15);
 }
 
-/* Intro Animation Styles */
-@keyframes fadeInLogo {
-    0% {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
+.glass-interactive.selected {
+    background: linear-gradient(145deg, rgba(34, 211, 238, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
 }
 
-@keyframes neonPulse {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
+/* -------------------------------------
+   5. COMPONENTS
+------------------------------------- */
 
-@keyframes pulseGlow {
-    0%, 100% {
-        opacity: 0.6;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    50% {
-        opacity: 0.9;
-        transform: translate(-50%, -50%) scale(1.1);
-    }
-}
-
-@keyframes shineSweep {
-    0% {
-        left: -100%;
-    }
-    100% {
-        left: 100%;
-    }
-}
-
-@keyframes fadeOutIntro {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Product Carousel */
-.product-carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 1rem;
-    padding: 1rem 0;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
-
-.product-carousel::-webkit-scrollbar {
-    height: 8px;
-}
-
-.product-carousel::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-}
-
-.product-carousel::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
-    border-radius: 4px;
-}
-
-.product-carousel::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(90deg, var(--glow-purple), var(--glow-cyan));
-}
-
-/* Exercise Cards */
-.exercise-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(34, 211, 238, 0.2);
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.exercise-card:hover {
-    border-color: var(--glow-cyan);
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
-    transform: translateY(-4px);
-}
-
-/* Responsive Breakpoints */
-@media (max-width: 768px) {
-    .glass {
-        padding: 1rem !important;
-    }
-    
-    .btn-neon {
-        padding: 10px 20px;
-        font-size: 14px;
-    }
-    
-    .product-carousel {
-        gap: 0.75rem;
-    }
-}
-
-@media (max-width: 480px) {
-    body {
-        font-size: 14px;
-    }
-    
-    .btn-neon {
-        padding: 8px 16px;
-        font-size: 12px;
-    }
-}
-
-/* Link Hover Effects */
-a {
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: var(--glow-cyan);
-}
-
-/* Notification Badge */
-.notification-badge {
-    background: linear-gradient(135deg, var(--glow-pink), var(--glow-purple));
-    color: white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-purple) 100%);
+    color: #000;
+    /* Black text on bright gradient */
+    font-weight: 600;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    /* Pill shape */
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+    gap: 0.5rem;
 }
 
-/* Loading Spinner */
-.spinner {
-    border: 3px solid rgba(34, 211, 238, 0.2);
-    border-top-color: var(--glow-cyan);
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Form Inputs */
+.input-field {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.8rem 1rem;
+    border-radius: 0.75rem;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+}
+
+/* Loaders */
+.loader-circle {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--primary-cyan);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
 
+::-webkit-scrollbar-track {
+    background: #050505;
+}
 
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
 
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-cyan);
+}
 
+/* Mobile Nav Enhancement */
+#mobileMenu {
+    transform-origin: top;
+    animation: menuOpen 0.3s var(--ease-elastic);
+}
+
+@keyframes menuOpen {
+    from {
+        opacity: 0;
+        transform: scaleY(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}

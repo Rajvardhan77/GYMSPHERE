@@ -40,11 +40,17 @@ def activity():
         return redirect(url_for("onboarding.fitness_level"))
     return render_template("activity.html")
 
+from services.plan_service import generate_month_plan
+
 @onboarding_bp.route("/fitness-level", methods=["GET", "POST"])
 def fitness_level():
     if request.method == "POST" and current_user.is_authenticated:
         current_user.fitness_level = request.form.get("fitness_level")
         db.session.commit()
+        
+        # Generate 30-Day Premium Plan
+        generate_month_plan(current_user)
+        
         return redirect(url_for("core.dashboard"))
     return render_template("fitness_level.html")
 

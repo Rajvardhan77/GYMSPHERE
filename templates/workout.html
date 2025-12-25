@@ -44,7 +44,8 @@
                 ⚙️ {{ item }}
             </span>
             {% endfor %}
-            <a href="#" class="text-xs text-gray-500 underline ml-auto flex items-center hover:text-white">Shop Gear
+            <a href="{{ url_for('core.shop_page') }}"
+                class="text-xs text-gray-500 underline ml-auto flex items-center hover:text-white">Shop Gear
                 →</a>
         </div>
     </div>
@@ -107,16 +108,27 @@
         <div id="guidedContent" class="w-full max-w-md text-center space-y-6">
             <div class="text-xs font-bold text-cyan-400 uppercase tracking-widest" id="guidedPhase">WARM UP</div>
 
+            <!-- Video/Animation Container -->
             <div
-                class="relative w-64 h-64 mx-auto rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center mb-6 neon-border">
-                <div class="text-6xl animate-pulse" id="guidedIcon">🏃</div>
-                <!-- Timer Overlay -->
-                <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
-                    <circle cx="128" cy="128" r="124" stroke="rgba(255,255,255,0.1)" stroke-width="4" fill="none">
-                    </circle>
-                    <circle id="timerCircle" cx="128" cy="128" r="124" stroke="#22d3ee" stroke-width="4" fill="none"
-                        stroke-dasharray="779" stroke-dashoffset="0" class="transition-all duration-1000"></circle>
-                </svg>
+                class="relative w-full aspect-video mx-auto rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-cyan-500/10 mb-6 group bg-gray-900/50 flex items-center justify-center">
+
+                <!-- Emoji Display -->
+                <div id="guidedEmoji"
+                    class="text-9xl animate-bounce filter drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] select-none cursor-default pb-4">
+                    🏋️
+                </div>
+
+                <!-- Timer Overlay Ring (Hidden by default, shown when timer active) -->
+                <div id="timerOverlay"
+                    class="absolute inset-0 bg-black/80 z-10 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+                    <svg class="w-32 h-32 -rotate-90">
+                        <circle cx="64" cy="64" r="60" stroke="rgba(255,255,255,0.1)" stroke-width="4" fill="none">
+                        </circle>
+                        <circle id="timerCircle" cx="64" cy="64" r="60" stroke="#22d3ee" stroke-width="4" fill="none"
+                            stroke-dasharray="377" stroke-dashoffset="0" class="transition-all duration-1000"></circle>
+                    </svg>
+                    <div id="timerText" class="absolute text-3xl font-bold font-mono text-cyan-400">00:00</div>
+                </div>
             </div>
 
             <h2 class="text-3xl font-bold text-white" id="guidedName">Jumping Jacks</h2>
@@ -143,9 +155,11 @@
         <!-- Timer Controls (Optional) -->
         <div class="mt-6 flex gap-4">
             <button onclick="startTimer(60)"
-                class="text-xs px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-gray-300">Start 60s Timer</button>
+                class="text-xs px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-gray-300">Start 60s
+                Timer</button>
             <button onclick="startTimer(30)"
-                class="text-xs px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-gray-300">Start 30s Timer</button>
+                class="text-xs px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-gray-300">Start 30s
+                Timer</button>
         </div>
     </div>
 </div>
@@ -155,6 +169,24 @@
     const workoutData = {{ workout.exercises | tojson }};
     let currentIndex = 0;
     let timerInterval;
+
+    // Emoji Map (Perfect Reference 🌟)
+    const emojiMap = {
+        "jumping jacks": "🤸",
+        "running": "🏃‍♂️",
+        "push-ups": "💪",
+        "squats": "🦵",
+        "lunges": "🚶",
+        "plank": "🪵",
+        "stretching": "🧘",
+        "dumbbell rows": "🚣",
+        "bicep curls": "🤳",
+        "crunches": "🍫",
+        // Generic Fallbacks
+        "strength": "🏋️",
+        "cardio": "💓",
+        "yoga": "🧘‍♀️"
+    };
 
     function startGuidedMode() {
         document.getElementById('guidedModal').classList.remove('hidden');
@@ -181,7 +213,32 @@
         document.getElementById('guidedSets').innerText = (ex.sets || 3) + " sets";
         document.getElementById('guidedPhase').innerText = ex.phase || "Exercise";
         document.getElementById('guidedDesc').innerText = ex.description || "Focus on form.";
-        document.getElementById('guidedIcon').innerText = (index % 2 == 0) ? "🏋️" : "🔥"; // Simple Toggle
+
+        // Emoji Logic
+        const display = document.getElementById('guidedEmoji');
+        const nameLower = ex.name.toLowerCase();
+
+        let emoji = emojiMap[nameLower];
+
+        // Fuzzy Match
+        if (!emoji) {
+            if (nameLower.includes("jump") || nameLower.includes("cardio") || nameLower.includes("hiit")) {
+                emoji = emojiMap["cardio"];
+            } else if (nameLower.includes("yoga") || nameLower.includes("stretch") || nameLower.includes("mobility")) {
+                emoji = emojiMap["yoga"];
+            } else if (nameLower.includes("run") || nameLower.includes("walk")) {
+                emoji = emojiMap["running"];
+            } else if (nameLower.includes("squat") || nameLower.includes("leg")) {
+                emoji = emojiMap["squats"];
+            } else {
+                emoji = emojiMap["strength"];
+            }
+        }
+
+        // Safety check
+        if (!emoji) emoji = emojiMap["strength"];
+
+        display.innerText = emoji;
 
         // Progress Bar
         const pct = ((index + 1) / total) * 100;
@@ -219,11 +276,7 @@
             nextBtn.disabled = true;
             nextBtn.innerText = "Saving...";
 
-            // We need an entry ID. For now, we'll try to find "today's" entry ID via API or use a fallback if not in a plan.
-            // Since this is a "Quick Workout" or "Guided Mode" started from dashboard, we might not have a specific plan entry ID handy in this context unless passed.
-            // However, the dashboard logic implies we are checking in for *today's* plan.
-
-            // First, fetch today's plan entry to get ID
+            // Check-in logic
             fetch('/api/plan/today')
                 .then(r => r.json())
                 .then(data => {
@@ -232,16 +285,12 @@
                         entryId = data.entry.id;
                     }
 
-                    // If no plan, we can't strictly "check in" to a plan, but we can log progress.
-                    // For now, let's assume if they are here, they might have a plan or we just finish.
-
                     if (!entryId) {
                         alert("Workout Complete! (No active plan found to check off)");
-                        window.location.href = "{{ url_for('dashboard') }}";
+                        window.location.href = "{{ url_for('core.dashboard') }}";
                         return;
                     }
 
-                    // Real Check-in
                     fetch('/api/plan/checkin', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -255,7 +304,7 @@
                         .then(res => {
                             if (res.status === 'ok') {
                                 alert("Workout logged & Streak updated! 🔥");
-                                window.location.href = "{{ url_for('dashboard') }}";
+                                window.location.href = "{{ url_for('core.dashboard') }}";
                             } else {
                                 alert("Error saving workout. Please try again.");
                                 nextBtn.disabled = false;
@@ -270,31 +319,50 @@
         }
     }
 
-    // Simple Timer Logic
+    // Timer Logic Updated for new Overlay
     function startTimer(seconds) {
         stopTimer();
         let left = seconds;
+
+        // Show Overlay
+        const overlay = document.getElementById('timerOverlay');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100', 'pointer-events-auto');
+
         const circle = document.getElementById('timerCircle');
-        const totalDash = 779;
+        const text = document.getElementById('timerText');
+        const totalDash = 377; // 2 * pi * 60
 
         circle.style.strokeDashoffset = 0;
+        text.innerText = formatTime(left);
 
         timerInterval = setInterval(() => {
             left--;
             const offset = totalDash - (totalDash * left / seconds);
             circle.style.strokeDashoffset = offset;
+            text.innerText = formatTime(left);
 
             if (left <= 0) {
                 stopTimer();
                 // Play sound?
-                alert("Time's up!");
+                // alert("Time's up!"); // Removing blocking alert for smoother flow
+                // Just hide overlay automatically?
+                setTimeout(stopTimer, 1000);
             }
         }, 1000);
     }
 
     function stopTimer() {
         if (timerInterval) clearInterval(timerInterval);
-        document.getElementById('timerCircle').style.strokeDashoffset = 0;
+        const overlay = document.getElementById('timerOverlay');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100', 'pointer-events-auto');
+    }
+
+    function formatTime(sec) {
+        const m = Math.floor(sec / 60).toString().padStart(2, '0');
+        const s = (sec % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
     }
 
 </script>

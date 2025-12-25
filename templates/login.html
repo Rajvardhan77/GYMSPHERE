@@ -12,7 +12,7 @@
     <p class="text-gray-300 mt-2">Welcome back! Enter your credentials to continue.</p>
   </div>
 
-  <form method="POST" action="{{ url_for('login') }}" class="glass neon-border rounded-3xl p-8 space-y-5">
+  <form method="POST" action="{{ url_for('auth.login') }}" class="glass neon-border rounded-3xl p-8 space-y-5">
     <div class="text-left space-y-2">
       <label class="text-sm text-gray-300">Email</label>
       <input type="email" name="email" required
@@ -34,11 +34,7 @@
 
   <div class="text-sm text-gray-300">
     Don't have an account?
-    <a href="{{ url_for('register') }}" class="text-cyan-200 hover:text-purple-200 transition">Register</a>
+    <a href="{{ url_for('auth.register') }}" class="text-cyan-200 hover:text-purple-200 transition">Register</a>
   </div>
 </div>
 {% endblock %}
-
-
-
-
